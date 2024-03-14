@@ -24,8 +24,8 @@ def determine_high_periods(df:pd.DataFrame):
          minute_wise_price_movements.append('N')
       indexes.append(index)
       if row['datetime'].split(" ")[1]=="23:59" :
-         all_activity.append("".join(minute_wise_price_movements))
-         all_indexes_days.append(indexes)
+         all_activity.append("".join(minute_wise_price_movements.copy()))
+         all_indexes_days.append(indexes.copy())
          minute_wise_price_movements.clear()
          indexes.clear()
   return all_activity, all_indexes_days
@@ -53,13 +53,13 @@ def weelcome_message(df:pd.DataFrame):
 
 def estimate_gains(indexes:list[int], df:pd.DataFrame):
   for index in indexes:
-    buy_date_time=df.iloc[index]['datetime']
+    buy_date_time=df.iloc[index-1]['datetime']
     sell_date_time=df.iloc[index]['datetime']
     sell_price = df.iloc[index]['close']
-    buy_price = df.iloc[index]['close']
+    buy_price = df.iloc[index-1]['close']
     gain = sell_price - buy_price
     percentage=(gain/buy_price) * 100
-    print(f"a {percentage}% gain is made by buying on {buy_date_time} at {buy_price} and selling on {sell_date_time} at {sell_price}")
+    print(f"\n\na {percentage}% gain is made by buying on {buy_date_time} at {buy_price} and selling on {sell_date_time} at {sell_price}\n\n")
 
 def findPatterns(days:list[str], indexes:list[list[int]]):
    print("\nThe current pattern searches for where they are two consecutive losses followed by at least two consective gains\n")
@@ -84,4 +84,5 @@ df = getDF()
 weelcome_message(df)
 all_days, indexes_all=determine_high_periods(df=df)
 patterns, match_indexes=findPatterns(all_days, indexes_all)
+
 estimate_gains(match_indexes,  df)
